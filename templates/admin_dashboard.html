@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h2 class="mt-4">Dashboard de Administración</h2>
+
+<div class="row mt-4">
+
+  <div class="col-md-6">
+    <div class="card p-4 shadow dashboard-card">
+      <h3>Usuarios</h3>
+      <p class="count-number">{{ users_count }}</p>
+      <a href="{{ url_for('users_manage') }}" class="btn btn-primary">Administrar Usuarios</a>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <div class="card p-4 shadow dashboard-card">
+      <h3>Productos</h3>
+      <p class="count-number">{{ products_count }}</p>
+      <a href="{{ url_for('products_manage') }}" class="btn btn-primary">Administrar Productos</a>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

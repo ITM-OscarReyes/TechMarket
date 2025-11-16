@@ -1,0 +1,47 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Administrar productos</h3>
+
+<a href="{{ url_for('product_new') }}" class="btn btn-success mb-3">Crear producto</a>
+
+<div class="card p-3 shadow">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Administración de productos ⚙️</h2>
+    </div>
+    <table class="table table-striped">
+    <thead>
+        <tr>
+        <th>ID</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Cantidad</th><th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for p in products %}
+        <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.name }}</td>
+        <td>{{ p.description }}</td>
+        <td>${{ p.price }}</td>
+        <td>{{ p.quantity }}</td>
+        <td>
+            <a class="btn btn-warning btn-sm" href="{{ url_for('product_edit', product_id=p.id) }}">Editar</a>
+            <button class="btn btn-danger btn-sm" onclick="deleteProduct('{{ p.id }}')">Eliminar</button>
+        </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+    </table>
+</div>
+
+<script>
+async function deleteProduct(id) {
+  if (confirm("¿Eliminar producto?")) {
+    const r = await fetch(`/api/products/${id}`, { method: "DELETE" });
+    const j = await r.json();
+    alert(j.message);
+    if (r.status === 200) location.reload();
+  }
+}
+</script>
+
+{% endblock %}
