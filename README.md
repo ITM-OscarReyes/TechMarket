@@ -26,6 +26,7 @@ Este proyecto es un **simulador básico de tienda online**, desarrollado como ac
 
 ## 📁 Estructura del Proyecto
 
+```text
 TechMarket/
 │
 ├─ app.py                   # App principal de Flask
@@ -56,6 +57,7 @@ TechMarket/
 └─ tests/
 │   └─ products_test.py     # Pruebas unitarias CRUD de productos
 │   └─ users_test.py        # Pruebas unitarias CRUD de usuarios
+```
 
 ---
 
@@ -77,10 +79,10 @@ cd TechMarket
 ### 2️⃣ Crear y activar entorno virtual
 python -m venv venv
 
-# Windows
+#### Windows
 venv\Scripts\activate
 
-# Mac / Linux
+#### Mac / Linux
 source venv/bin/activate
 
 ### 3️⃣ Instalar dependencias
