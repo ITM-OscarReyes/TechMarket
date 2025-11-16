@@ -1,0 +1,118 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>{{ "Create Product" if action == "new" else "Edit Product" }}</h3>
+
+<div class="product-form-container">
+<form id="product-form">
+  <div class="mb-3">
+    <label>ID</label>
+    <input name="id" id="prod-id" class="form-control" 
+           {% if action == "edit" %}readonly{% endif %} required>
+  </div>
+
+  <div class="mb-3">
+    <label>Nombre</label>
+    <input id="prod-name" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Descripción</label>
+    <input id="prod-desc" class="form-control">
+  </div>
+
+  <div class="mb-3">
+    <label>Precio</label>
+    <input id="prod-price" type="number" step="0.01" class="form-control" required>
+  </div>
+
+  <div class="mb-3">
+    <label>Cantidad</label>
+    <input id="prod-qty" type="number" class="form-control" required>
+  </div>
+
+  <button class="btn btn-primary">Guardar</button>
+  <a class="btn btn-secondary" href="{{ url_for('products_manage') }}">Cancelar</a>
+</form>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const action = "{{ action|default('new') }}";
+    const product = JSON.parse(`{{ product|default({})|tojson }}`);
+
+    if (action === "edit" && product) {
+      document.getElementById("prod-id").value = product.id;
+      document.getElementById("prod-name").value = product.name;
+      document.getElementById("prod-desc").value = product.description;
+      document.getElementById("prod-price").value = product.price;
+      document.getElementById("prod-qty").value = product.quantity;
+    }
+
+    document.getElementById("product-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      clearAlert();
+
+      const btn = document.querySelector("button.btn-primary");
+      btn.disabled = true;
+      btn.innerText = "Guardando...";
+
+      const payload = {
+        id: parseInt(document.getElementById("prod-id").value),
+        name: document.getElementById("prod-name").value.trim(),
+        description: document.getElementById("prod-desc").value.trim(),
+        price: parseFloat(document.getElementById("prod-price").value),
+        quantity: parseInt(document.getElementById("prod-qty").value)
+      };
+
+      if (!payload.id || !payload.name) {
+        btn.disabled = false;
+        btn.innerText = "Guardar";
+        return showAlert("Todos los campos obligatorios deben estar completos.", "danger");
+      }
+      if (isNaN(payload.price) || payload.price < 0) {
+        btn.disabled = false; btn.innerText = "Guardar";
+        return showAlert("El precio debe ser un número positivo.", "danger");
+      }
+      if (isNaN(payload.quantity) || payload.quantity < 0) {
+        btn.disabled = false; btn.innerText = "Guardar";
+        return showAlert("La cantidad debe ser un número positivo.", "danger");
+      }
+
+      const response = await fetch(
+        action === "new" ? "/api/products" : `/api/products/${payload.id}`,
+        {
+          method: action === "new" ? "POST" : "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        }
+      );
+
+      const result = await response.json().catch(() => ({ message: "Error desconocido" }));
+
+      if (response.ok) {
+        return window.location.href = "/products/manage";
+      }
+
+      showAlert(result.message || "Error al procesar solicitud", "danger");
+      btn.disabled = false;
+      btn.innerText = "Guardar";
+    });
+  });
+
+  function showAlert(message, type) {
+    const alertBox = document.createElement("div");
+    alertBox.className = `alert alert-${type} custom-alert`;
+    alertBox.innerText = message;
+    document.querySelector(".product-form-container").prepend(alertBox);
+    setTimeout(() => alertBox.remove(), 4000);
+  }
+
+  function clearAlert() {
+    const alert = document.querySelector(".alert");
+    if (alert) alert.remove();
+  }
+</script>
+
+
+{% endblock %}
