@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>{{ "Crear Usuario" if action=="new" else "Editar Usuario" }}</h3>
+
+<form id="user-form">
+    <div class="mb-3">
+        <label>Usuario</label>
+        <input id="username" class="form-control" {% if action=="edit" %}readonly{% endif %} required>
+    </div>
+
+    {% if action == "new" %}
+    <div class="mb-3">
+        <label>Contraseña</label>
+        <input id="password" type="password" class="form-control" required>
+    </div>
+    {% endif %}
+
+    <div class="mb-3">
+        <label>Rol</label>
+        <select id="role" class="form-control">
+            <option value="user">Usuario</option>
+            <option value="admin">Administrador</option>
+        </select>
+    </div>
+
+    {% if action == "edit" %}
+    <div class="mb-3">
+        <label>Estado</label>
+        <select id="active" class="form-control">
+            <option value="1">Activo</option>
+            <option value="0">Inactivo</option>
+        </select>
+    </div>
+    {% endif %}
+
+    <button class="btn btn-primary">Guardar</button>
+    <a href="{{ url_for('users_manage') }}" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const action = "{{ action }}";
+    const user = JSON.parse(`{{ user|tojson }}`);
+
+    if (action === "edit") {
+        document.getElementById("username").value = user.username;
+        document.getElementById("role").value = user.role;
+        document.getElementById("active").value = user.active;
+    }
+
+    document.getElementById("user-form").addEventListener("submit", async (e)=>{
+        e.preventDefault();
+
+        const payload = {
+            role: document.getElementById("role").value,
+            active: parseInt(document.getElementById("active")?.value)
+        };
+
+        const url = action === "new"
+          ? "/api/users"
+          : `/api/users/${user.username}`;
+
+        if(action==="new") {
+            payload.username = document.getElementById("username").value;
+            payload.password = document.getElementById("password").value;
+        }
+
+        const r = await fetch(url, {
+            method: action === "new" ? "POST" : "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const res = await r.json();
+        alert(res.message);
+        if (r.ok) window.location = "/users/manage";
+    });
+});
+</script>
+
+{% endblock %}

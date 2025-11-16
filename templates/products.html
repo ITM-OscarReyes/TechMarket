@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<h3>Listado de productos</h3>
+
+{% if role == 'admin' %}
+<a href="{{ url_for('products_manage') }}" class="btn btn-primary mb-3">Administrar productos</a>
+{% endif %}
+
+<div class="card p-3 shadow">
+    <h2>Productos disponibles 🛒</h2>
+    <table class="table">
+        <thead>
+            <tr>
+            <th>ID</th><th>Nombre</th><th>Descripción</th><th>Precio</th><th>Cantidad</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in products %}
+            <tr>
+            <td>{{ p.id }}</td>
+            <td>{{ p.name }}</td>
+            <td>{{ p.description }}</td>
+            <td>${{ p.price }}</td>
+            <td>{{ p.quantity }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}
